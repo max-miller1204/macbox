@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+MACBOX_VERSION="0.1.0"
+
+# Resolve lib directory (works both from repo clone and make install)
+MACBOX_BIN="$(cd "$(dirname "$0")" && pwd -P)"
+if [[ -d "${MACBOX_BIN}/../lib/macbox" ]]; then
+  LIB_DIR="${MACBOX_BIN}/../lib/macbox"
+elif [[ -d "${MACBOX_BIN}/lib" ]]; then
+  LIB_DIR="${MACBOX_BIN}/lib"
+else
+  echo "error: Cannot find macbox lib directory" >&2
+  exit 1
+fi
+
+source "${LIB_DIR}/common.sh"
+
+case "${1:-}" in
+  create)  shift; source "${LIB_DIR}/create.sh";  cmd_create "$@" ;;
+  enter)   shift; source "${LIB_DIR}/enter.sh";    cmd_enter "$@" ;;
+  list|ls) shift; source "${LIB_DIR}/list.sh";     cmd_list "$@" ;;
+  stop)    shift; source "${LIB_DIR}/stop.sh";      cmd_stop "$@" ;;
+  rm)      shift; source "${LIB_DIR}/rm.sh";        cmd_rm "$@" ;;
+  version|--version|-v) echo "macbox ${MACBOX_VERSION}" ;;
+  help|--help|-h|"")    usage ;;
+  *)       die "Unknown command: $1. Run 'macbox help' for usage." ;;
+esac
